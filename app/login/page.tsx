@@ -8,6 +8,7 @@ import { useState } from "react";
 import { auth, db } from "@/lib/firebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { Toaster, toast } from "react-hot-toast";
 
 const Login = () => {
   const router = useRouter();
@@ -19,7 +20,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Please fill in all fields before logging in.");
+      toast.error("Please fill in all fields before logging in.");
       return;
     }
 
@@ -33,41 +34,46 @@ const Login = () => {
       );
 
       if (!userCredential.user.emailVerified) {
-        alert("Please verify your email before logging in.");
+        toast.error("Please verify your email before logging in.");
         return;
       }
 
-      const userDoc = await getDoc(
-        doc(db, "users", userCredential.user.uid)
-      );
+      const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
       const userType = userDoc.exists() ? userDoc.data().userType : null;
 
-      if (userType === "Farmer") router.push("/farmer");
-      else if (userType === "Buyer") router.push("/buyyer");
-      else alert("User type not found!");
+      if (userType === "Farmer") {
+        toast.success("Login successful! Redirecting to Farmer Dashboard...");
+        router.push("/farmer");
+      } else if (userType === "Buyer") {
+        toast.success("Login successful! Redirecting to Buyer Dashboard...");
+        router.push("/buyyer");
+      } else {
+        toast.error("User type not found!");
+      }
     } catch (error: any) {
-      alert(error.message);
+      toast.error("Invalid info");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-[100vh]">
-      <div className="flex-1 bg-[url('/loginbg.jpg')] bg-cover bg-center" />
+    <div className="flex flex-col md:flex-row min-h-[100vh]">
+      <div className="hidden md:flex flex-1 bg-[url('/loginbg.jpg')] bg-cover bg-center" />
 
       <form
         onSubmit={handleSubmit}
-        className="flex flex-1 flex-col items-center pt-6"
+        className="flex flex-1 flex-col items-center justify-center px-6 py-10 md:py-6"
       >
-        <Image src={Logo} width={200} alt="logo" className="mb-6" />
-        <h4 className="font-bold text-3xl mb-8">Welcome Back!</h4>
+        <Toaster position="top-right" reverseOrder={false} />
+        <Image src={Logo} width={150} alt="logo" className="mb-4 md:mb-6" />
+        <h4 className="font-bold text-2xl md:text-3xl mb-8 text-center">Welcome Back!</h4>
 
-        <nav className="flex flex-col w-[80%] mb-6">
-          <label>Your Email</label>
+        <nav className="flex flex-col w-full md:w-[80%] mb-6">
+          <label className="mb-2 font-medium">Your Email</label>
           <input
             type="email"
-            className="bg-gray-100 min-h-15 pl-4 rounded-sm"
+            className="bg-gray-100 min-h-12 pl-4 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1E8449]"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -75,11 +81,11 @@ const Login = () => {
           />
         </nav>
 
-        <nav className="flex flex-col w-[80%] mb-8">
-          <label>Your Password</label>
+        <nav className="flex flex-col w-full md:w-[80%] mb-8">
+          <label className="mb-2 font-medium">Your Password</label>
           <input
             type="password"
-            className="bg-gray-100 min-h-15 pl-4 rounded-sm"
+            className="bg-gray-100 min-h-12 pl-4 rounded-sm focus:outline-none focus:ring-2 focus:ring-[#1E8449]"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -87,17 +93,17 @@ const Login = () => {
           />
         </nav>
 
-        <nav className="flex flex-col w-[80%]">
+        <nav className="flex flex-col w-full md:w-[80%]">
           <button
             type="submit"
             disabled={loading}
-            className="bg-[#1E8449] min-h-15 cursor-pointer text-white font-semibold rounded-sm hover:bg-[#166936] transition-all"
+            className="bg-[#1E8449] min-h-12 cursor-pointer text-white font-semibold rounded-sm hover:bg-[#166936] transition-all disabled:opacity-70"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </nav>
 
-        <p className="my-10">
+        <p className="my-8 text-center text-sm md:text-base">
           Don’t have an account?{" "}
           <Link href="/register" className="text-[#1E8449] underline">
             Sign up

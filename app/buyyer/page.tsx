@@ -7,6 +7,7 @@ import Footer from "@/components/footer/page";
 import ProductPlaceholder from "../../public/product.png";
 import { auth, db } from "@/lib/firebaseConfig";
 import { signOut } from "firebase/auth";
+import { Toaster, toast } from "react-hot-toast";
 import {
   collection,
   addDoc,
@@ -43,7 +44,6 @@ const Buyer = () => {
 
   const user = auth.currentUser;
 
-  // Fetch all products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -61,7 +61,6 @@ const Buyer = () => {
     fetchProducts();
   }, []);
 
-  // Fetch buyer orders
   useEffect(() => {
     const fetchOrders = async () => {
       if (!user) return;
@@ -80,7 +79,6 @@ const Buyer = () => {
     fetchOrders();
   }, [user]);
 
-  // Search functionality
   useEffect(() => {
     if (!searchTerm.trim()) setFilteredProducts(products);
     else {
@@ -91,7 +89,6 @@ const Buyer = () => {
     }
   }, [searchTerm, products]);
 
-  // Add to Cart
   const addToCart = (product: Product) => {
     setCartItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
@@ -105,7 +102,6 @@ const Buyer = () => {
     });
   };
 
-  // Update quantity
   const updateQuantity = (id: string, change: number) => {
     setCartItems((prev) =>
       prev
@@ -118,55 +114,51 @@ const Buyer = () => {
     );
   };
 
-  // Checkout
   const handleCheckout = async () => {
-  if (!user) {
-    alert("Please log in to checkout.");
-    router.push("/login");
-    return;
-  }
-
-  if (cartItems.length === 0) {
-    alert("Your cart is empty!");
-    return;
-  }
-
-  try {
-    // Group cart items by farmerId
-    const itemsByFarmer: Record<string, CartItem[]> = {};
-    cartItems.forEach((item) => {
-      if (!item.farmerId) return; // skip if no farmerId
-      if (!itemsByFarmer[item.farmerId]) itemsByFarmer[item.farmerId] = [];
-      itemsByFarmer[item.farmerId].push(item);
-    });
-
-    // Create one order per farmer
-    for (const [farmerId, items] of Object.entries(itemsByFarmer)) {
-      await addDoc(collection(db, "orders"), {
-        buyerId: user.uid,
-        buyerName: user.displayName || "Anonymous",
-        farmerId,
-        items: items.map((i) => ({
-          productId: i.id,
-          productName: i.name,
-          quantity: i.quantity,
-          price: i.price,
-          totalPrice: i.price * i.quantity,
-        })),
-        status: "pending",
-        createdAt: serverTimestamp(),
-      });
+    if (!user) {
+      alert("Please log in to checkout.");
+      router.push("/login");
+      return;
     }
 
-    setCartItems([]); // clear cart
-    alert("Order placed successfully!");
-    setActiveSection("Order"); // go to orders section
-  } catch (error) {
-    console.error("Checkout error:", error);
-    alert("Failed to place order. Try again.");
-  }
-};
+    if (cartItems.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
 
+    try {
+      const itemsByFarmer: Record<string, CartItem[]> = {};
+      cartItems.forEach((item) => {
+        if (!item.farmerId) return;
+        if (!itemsByFarmer[item.farmerId]) itemsByFarmer[item.farmerId] = [];
+        itemsByFarmer[item.farmerId].push(item);
+      });
+
+      for (const [farmerId, items] of Object.entries(itemsByFarmer)) {
+        await addDoc(collection(db, "orders"), {
+          buyerId: user.uid,
+          buyerName: user.displayName || "Anonymous",
+          farmerId,
+          items: items.map((i) => ({
+            productId: i.id,
+            productName: i.name,
+            quantity: i.quantity,
+            price: i.price,
+            totalPrice: i.price * i.quantity,
+          })),
+          status: "pending",
+          createdAt: serverTimestamp(),
+        });
+      }
+
+      setCartItems([]);
+       toast.success("Order placed successfully!");
+      setActiveSection("Order");
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Failed to place order. Try again.");
+    }
+  };
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -178,16 +170,16 @@ const Buyer = () => {
       case "Dashboard":
         return (
           <div className="mt-5">
-            <h2 className="text-3xl font-bold mb-5">Buyer Dashboard</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-5">Buyer Dashboard</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
               {["Total Orders", "Pending", "Delivered", "Cancelled"].map(
                 (title, i) => (
                   <div
                     key={title}
-                    className="flex flex-col items-center bg-gray-100 rounded-lg p-6 shadow-sm"
+                    className="flex flex-col items-center bg-gray-100 rounded-lg p-4 sm:p-6 shadow-sm"
                   >
-                    <p className="font-semibold">{title}</p>
-                    <h4 className="text-3xl font-bold mt-2">
+                    <p className="font-semibold text-sm sm:text-base">{title}</p>
+                    <h4 className="text-2xl sm:text-3xl font-bold mt-2">
                       {i === 0
                         ? orders.length
                         : orders.filter((o) => o.status === title.toLowerCase())
@@ -203,21 +195,21 @@ const Buyer = () => {
       case "Store":
         return (
           <div className="mt-5">
-            <h2 className="text-3xl font-bold mb-5">Buyer Store</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-5">Buyer Store</h2>
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full mt-2 p-4 border border-gray-400 rounded"
+              className="w-full mt-2 p-3 sm:p-4 border border-gray-400 rounded"
               placeholder="Search for product or crop type..."
             />
 
-            <section className="flex flex-wrap justify-between mt-8">
+            <section className="flex flex-col sm:flex-row sm:flex-wrap justify-center sm:justify-start gap-4 mt-8">
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((p) => (
                   <div
                     key={p.id}
-                    className="border w-[30%] border-gray-300 mb-10 rounded-lg overflow-hidden shadow-sm"
+                    className="border w-full sm:w-[48%] lg:w-[30%] border-gray-300 rounded-lg overflow-hidden shadow-sm"
                   >
                     <Image
                       src={p.imageUrl || ProductPlaceholder}
@@ -255,7 +247,7 @@ const Buyer = () => {
         );
         return (
           <div className="mt-5">
-            <h2 className="text-3xl font-bold mb-5">Your Cart</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-5">Your Cart</h2>
             {cartItems.length === 0 ? (
               <p>Your cart is empty.</p>
             ) : (
@@ -264,13 +256,13 @@ const Buyer = () => {
                   {cartItems.map((item) => (
                     <div
                       key={item.id}
-                      className="flex justify-between items-center border p-4 rounded-lg"
+                      className="flex flex-col sm:flex-row justify-between items-start sm:items-center border p-4 rounded-lg"
                     >
                       <div>
                         <h4 className="font-semibold">{item.name}</h4>
                         <p>${item.price}</p>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 mt-2 sm:mt-0">
                         <button
                           onClick={() => updateQuantity(item.id, -1)}
                           className="px-2 border rounded"
@@ -289,7 +281,7 @@ const Buyer = () => {
                   ))}
                 </div>
                 <div className="mt-6 text-right">
-                  <p className="text-xl font-bold mb-3">
+                  <p className="text-xl sm:text-2xl font-bold mb-3">
                     Total: ${total.toFixed(2)}
                   </p>
                   <button
@@ -307,18 +299,19 @@ const Buyer = () => {
       case "Order":
         return (
           <div className="mt-5">
-            <h2 className="text-3xl font-bold mb-5">Your Orders</h2>
+            <Toaster position="top-right" reverseOrder={false} />
+            <h2 className="text-2xl sm:text-3xl font-bold mb-5">Your Orders</h2>
             {orders.length === 0 ? (
               <p>No orders found.</p>
             ) : (
               <div className="flex flex-col gap-4">
                 {orders.map((o) => (
-                    <div key={o.id} className="border p-4 rounded">
-                        <p className="font-semibold">Order ID: {o.id}</p>
-                        <p>Status: {o.status}</p>
-                        <p>Items: {o.items?.length || 0}</p>
-                    </div>
-                    ))}
+                  <div key={o.id} className="border p-4 rounded">
+                    <p className="font-semibold">Order ID: {o.id}</p>
+                    <p>Status: {o.status}</p>
+                    <p>Items: {o.items?.length || 0}</p>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -332,9 +325,9 @@ const Buyer = () => {
   return (
     <div>
       <Header />
-      <main className="flex mt-20">
-        <aside className="w-[20%] bg-[#1E8449] min-h-[100vh] text-white p-5">
-          <nav className="flex flex-col gap-6">
+      <main className="flex flex-col sm:flex-row mt-20">
+        <aside className="w-full sm:w-[20%] bg-[#1E8449] min-h-[50vh] sm:min-h-[100vh] text-white p-5">
+          <nav className="flex flex-row sm:flex-col gap-4 sm:gap-6 flex-wrap justify-around sm:justify-start">
             {["Dashboard", "Store", "Cart", "Order"].map((item) => (
               <p
                 key={item}
@@ -361,7 +354,7 @@ const Buyer = () => {
             </p>
           </nav>
         </aside>
-        <section className="flex-1 pl-20 pr-10 pb-10">{renderContent()}</section>
+        <section className="flex-1 px-4 sm:px-10 pb-10">{renderContent()}</section>
       </main>
       <Footer />
     </div>

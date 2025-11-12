@@ -65,7 +65,6 @@ const Farmer = () => {
 
   const currentUser = auth.currentUser;
 
-  // Fetch farmer's products
   const fetchProducts = async () => {
     if (!currentUser) return;
     setLoading(true);
@@ -81,7 +80,6 @@ const Farmer = () => {
     setLoading(false);
   };
 
-  // Fetch farmer's orders
   const fetchOrders = async () => {
     if (!currentUser) return;
     try {
@@ -106,7 +104,6 @@ const Farmer = () => {
     fetchOrders();
   }, [currentUser]);
 
-  // Logout
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -116,7 +113,6 @@ const Farmer = () => {
     }
   };
 
-  // Add / Edit product
   const handleAddOrEdit = async (e: FormEvent) => {
     e.preventDefault();
     if (!currentUser) return;
@@ -165,7 +161,6 @@ const Farmer = () => {
     }
   };
 
-  // Delete product
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
     try {
@@ -176,7 +171,6 @@ const Farmer = () => {
     }
   };
 
-  // Edit product
   const handleEdit = (product: Product) => {
     setName(product.name);
     setPrice(product.price);
@@ -192,7 +186,6 @@ const Farmer = () => {
       p.available.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Update order status
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
       await updateDoc(doc(db, "orders", orderId), { status: newStatus });
@@ -207,9 +200,9 @@ const Farmer = () => {
       <Header />
 
       {showForm && (
-        <main className="flex justify-center fixed top-0 left-0 w-full bg-[rgba(0,0,0,0.4)] min-h-[100vh] z-50 overflow-y-auto">
-          <section className="w-[80%] bg-white p-10 rounded-lg shadow-md mt-20">
-            <h2 className="text-3xl mb-5 font-semibold">{editId ? "Edit Listing" : "Add New Listing"}</h2>
+        <main className="flex justify-center fixed top-0 left-0 w-full bg-[rgba(0,0,0,0.4)] min-h-[100vh] z-50 overflow-y-auto px-4 sm:px-8">
+          <section className="w-full sm:w-[80%] bg-white p-6 sm:p-10 rounded-lg shadow-md mt-10 sm:mt-20">
+            <h2 className="text-2xl sm:text-3xl mb-5 font-semibold">{editId ? "Edit Listing" : "Add New Listing"}</h2>
             <form onSubmit={handleAddOrEdit}>
               <nav className="flex flex-col mb-4">
                 <label>Product Name</label>
@@ -231,20 +224,20 @@ const Farmer = () => {
                 <label>Image</label>
                 <input type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
               </nav>
-              <div className="flex gap-4 mt-4">
-                <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">{editId ? "Update" : "Add Listing"}</button>
-                <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border rounded">Cancel</button>
+              <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded w-full sm:w-auto">{editId ? "Update" : "Add Listing"}</button>
+                <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border rounded w-full sm:w-auto">Cancel</button>
               </div>
             </form>
           </section>
         </main>
       )}
 
-      <main className="flex mt-20">
-        <aside className="w-[20%] bg-[#1E8449] min-h-[100vh] text-white p-5">
-          <nav className="flex flex-col gap-6">
+      <main className="flex flex-col sm:flex-row mt-10 sm:mt-20">
+        <aside className="w-full sm:w-[20%] bg-[#1E8449] min-h-[50vh] sm:min-h-[100vh] text-white p-5">
+          <nav className="flex sm:flex-col flex-row sm:gap-6 gap-4 flex-wrap justify-around sm:justify-start">
             <p className={`cursor-pointer ${activeSection === "dashboard" ? "font-bold text-yellow-300" : ""}`} onClick={() => setActiveSection("dashboard")}>Dashboard</p>
-            <p className={`cursor-pointer ${activeSection === "listings" ? "font-bold text-yellow-300" : ""}`} onClick={() => setActiveSection("listings")}>Product Listings</p>
+            <p className={`cursor-pointer ${activeSection === "listings" ? "font-bold text-yellow-300" : ""}`} onClick={() => setActiveSection("listings")}>Listings</p>
             <p className={`cursor-pointer ${activeSection === "orders" ? "font-bold text-yellow-300" : ""}`} onClick={() => setActiveSection("orders")}>Orders</p>
             <p className="cursor-pointer">Messages</p>
             <p className="cursor-pointer">Notifications</p>
@@ -252,18 +245,18 @@ const Farmer = () => {
           </nav>
         </aside>
 
-        <section className="flex-1 p-10">
+        <section className="flex-1 p-4 sm:p-10">
           {activeSection === "dashboard" && (
             <article>
-              <h2 className="text-3xl font-bold mb-5">Farmer Dashboard</h2>
-              <div className="grid grid-cols-2 gap-8">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-5">Farmer Dashboard</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                 <div className="bg-gray-100 p-6 rounded-md text-center">
-                  <h4 className="text-xl font-semibold">Total Listings</h4>
-                  <p className="text-3xl mt-3">{products.length}</p>
+                  <h4 className="text-lg sm:text-xl font-semibold">Total Listings</h4>
+                  <p className="text-2xl sm:text-3xl mt-3">{products.length}</p>
                 </div>
                 <div className="bg-gray-100 p-6 rounded-md text-center">
-                  <h4 className="text-xl font-semibold">Orders Received</h4>
-                  <p className="text-3xl mt-3">{orders.length}</p>
+                  <h4 className="text-lg sm:text-xl font-semibold">Orders Received</h4>
+                  <p className="text-2xl sm:text-3xl mt-3">{orders.length}</p>
                 </div>
               </div>
             </article>
@@ -271,26 +264,26 @@ const Farmer = () => {
 
           {activeSection === "listings" && (
             <article>
-              <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-bold mb-5">Your Listings</h2>
-                <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-green-600 text-white rounded">Add New Listing</button>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-5">Your Listings</h2>
+                <button onClick={() => setShowForm(true)} className="px-4 py-2 bg-green-600 text-white rounded w-full sm:w-auto">Add New Listing</button>
               </div>
 
               <input type="text" className="w-full mt-4 mb-8 p-3 border border-gray-400 rounded" placeholder="Search your listings..." value={search} onChange={(e) => setSearch(e.target.value)} />
 
               {loading ? <p>Loading...</p> :
                 filteredProducts.length === 0 ? <p>No listings found.</p> :
-                  <div className="flex flex-wrap gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredProducts.map((p) => (
-                      <div key={p.id} className="flex flex-col justify-between w-[30%] border rounded p-3 shadow-sm">
-                        <Image src={p.imageUrl || ProductPlaceholder} alt={p.name} width={300} height={300} className="object-cover" />
+                      <div key={p.id} className="flex flex-col justify-between border rounded p-3 shadow-sm">
+                        <Image src={p.imageUrl || ProductPlaceholder} alt={p.name} width={300} height={300} className="object-cover w-full h-[250px]" />
                         <h3 className="font-bold mt-2">{p.name}</h3>
                         <p>${p.price}</p>
                         <p>{p.available}</p>
                         <p>{p.description}</p>
                         <div className="flex justify-between mt-3">
-                          <button className="px-6 py-1 border rounded" onClick={() => handleEdit(p)}>Edit</button>
-                          <button className="px-6 py-1 bg-red-500 text-white rounded" onClick={() => handleDelete(p.id)}>Delete</button>
+                          <button className="px-4 py-1 border rounded" onClick={() => handleEdit(p)}>Edit</button>
+                          <button className="px-4 py-1 bg-red-500 text-white rounded" onClick={() => handleDelete(p.id)}>Delete</button>
                         </div>
                       </div>
                     ))}
@@ -300,10 +293,10 @@ const Farmer = () => {
           )}
 
           {activeSection === "orders" && (
-            <article>
-              <h2 className="text-3xl font-bold mb-5">Orders Received</h2>
+            <article className="overflow-x-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-5">Orders Received</h2>
               {orders.length === 0 ? <p>No orders yet.</p> :
-                <table className="w-full border">
+                <table className="w-full border text-sm sm:text-base">
                   <thead>
                     <tr className="bg-gray-200 text-left">
                       <th className="p-3 border">Buyer ID</th>
@@ -318,13 +311,13 @@ const Farmer = () => {
                   <tbody>
                     {orders.map((order) => (
                       <tr key={order.id} className="border-b">
-                        <td className="p-3 border">{order.buyerId}</td>
+                        <td className="p-3 border break-all">{order.buyerId}</td>
                         <td className="p-3 border">{order.productName}</td>
                         <td className="p-3 border">{order.quantity}</td>
                         <td className="p-3 border">${(order.price * order.quantity).toFixed(2)}</td>
                         <td className="p-3 border">{order.status}</td>
-                        <td className="p-3 border text-sm">{order.createdAt?.toDate?.()?.toLocaleString() || ""}</td>
-                        <td className="p-3 border flex gap-2">
+                        <td className="p-3 border text-xs sm:text-sm">{order.createdAt?.toDate?.()?.toLocaleString() || ""}</td>
+                        <td className="p-3 border flex flex-col sm:flex-row gap-2">
                           {order.status === "pending" && (
                             <>
                               <button onClick={() => updateOrderStatus(order.id, "delivered")} className="px-2 py-1 bg-green-500 text-white rounded">Delivered</button>
