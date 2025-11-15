@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Header from "@/components/header/page";
 import Link from "next/link";
 import Image from "next/image";
@@ -9,49 +10,56 @@ import Touch from "../../public/touch.png";
 import Footer from "@/components/footer/page";
 
 const LandingPage = () => {
+  const [isClicked, setIsClicked] = useState(false);
   return (
     <div>
       <Header />
       <main>
-        <section className="w-full flex flex-col items-center justify-center text-center min-h-screen bg-[#2ECC71] bg-[url('/bg-hero.jpg')] bg-cover bg-center px-4">
-          <motion.h1 
-          initial={{y:100}}
-          whileInView={{y:0}}
-          transition={{duration:1}}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#222] leading-tight">
+        <section className="w-full flex flex-col items-center justify-center text-center min-h-screen bg-[#2ECC71] bg-[url('/bg-hero.jpg')] bg-cover bg-center px-4 py-20">
+          <motion.h1
+            initial={{ y: 100 }}
+            whileInView={{ y: 0 }}
+            transition={{ duration: 1 }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#222] leading-tight max-w-5xl"
+          >
             Buy Fresh. Sell Direct.{" "}
             <span className="text-[#1E8449]">Empower Farmers Worldwide.</span>
           </motion.h1>
-          <motion.p 
-            initial={{y:100, opacity:0}}
-            whileInView={{y:0, opacity:1}}
-            transition={{duration:1.5}}
-          className="text-white text-lg sm:text-xl md:text-2xl mt-6 md:mt-8 max-w-3xl mx-auto">
+
+          <motion.p
+            initial={{ y: 100, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1.5 }}
+            className="text-white text-lg sm:text-xl md:text-2xl mt-6 md:mt-8 max-w-3xl"
+          >
             AgroLink connects farmers and buyers globally, eliminating middlemen,
             ensuring fair trade, and promoting sustainable agriculture.
           </motion.p>
-          <nav className="flex flex-col md:flex-row items-center gap-6 mt-10">
+
+          <nav className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mt-10">
             <Link href="/register">
-              <motion.button 
-                initial={{y:100, opacity:0}}
-                whileInView={{y:0, opacity:1}}
-                transition={{duration:1.5}}
-                className="min-w-100 sm:w-60 h-13 bg-[#1E8449] rounded-3xl text-white font-semibold cursor-pointer hover:bg-[#27AE60] transition">
+              <motion.button
+                initial={{ y: 100, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ duration: 1.5 }}
+                className="px-8 py-3 sm:px-10 sm:py-4 bg-[#1E8449] rounded-full text-white text-lg font-semibold hover:bg-[#27AE60] transition"
+              >
                 Get Started
               </motion.button>
             </Link>
 
-            <Link href="/">
-              <motion.button 
-                initial={{y:100, opacity:0}}
-                whileInView={{y:0, opacity:1}}
-                transition={{duration:1.5}}
-              className="min-w-100 sm:w-60 h-13 bg-white rounded-3xl text-[#1E8449] hover:bg-[#27AE60] cursor-pointer font-semibold hover:bg-gray-100 transition">
-                Download App
-              </motion.button>
-            </Link>
+            <motion.button
+              initial={{ y: 100, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.5 }}
+              onClick={() => setIsClicked(true)}
+              className="px-8 py-3 sm:px-10 sm:py-4 bg-white rounded-full text-[#1E8449] text-lg font-semibold hover:bg-gray-100 transition"
+            >
+              {isClicked ? "Coming soon..." : "Download App"}
+            </motion.button>
           </nav>
         </section>
+
 
         <section className="flex flex-col-reverse md:flex-row items-center justify-between mt-20 md:mt-30 mx-auto w-[90%] min-h-20 bg-[url('/bghow.png')] bg-cover bg-right px-4 py-10">
           <nav className="text-center md:text-left">
